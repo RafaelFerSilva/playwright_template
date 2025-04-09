@@ -3,4 +3,12 @@ env
 .pytest_cache
 __pycache__
 .vscode
+allure-results
+allure-report
+report.html
+screenshots
+reports/
+report.md
+results.txt
+test-results
 logs

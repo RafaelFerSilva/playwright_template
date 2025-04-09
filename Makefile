@@ -3,3 +3,6 @@ clean:
 
 test: clean
 	pytest
+
+report:
+	allure serve reports/allure-results
