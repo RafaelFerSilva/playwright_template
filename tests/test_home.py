@@ -1,7 +1,7 @@
 import pytest
 from page_objects.home_page import HomePage
 
-class TestLogin:
+class TestHome:
     @pytest.fixture
     def home_page(self, page):
         return HomePage(page)
