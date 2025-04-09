@@ -9,6 +9,9 @@ class BasePage:
 
     def get_element(self, selector: str):
         return self.page.locator(selector)
+    
+    def get_page_title(self) -> str:
+        return self.page.title()
 
     def click_element(self, selector: str):
         self.get_element(selector).click()
