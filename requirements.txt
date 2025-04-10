@@ -6,3 +6,4 @@ pytest-html==4.1.1
 pytest-playwright==0.7.0
 allure-pytest==2.14.0
 pytest-xdist==3.6.1
+PyYAML==6.0.2

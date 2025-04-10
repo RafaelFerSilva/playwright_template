@@ -1,0 +1,9 @@
+ENVIRONMENT: "RC"
+DEVICE_NAME: "Nexus 5"
+SQL_SCRIPTS_FOLDER: "./resources/sql/"
+I18N_FOLDER_PATH: "./resources/i18n"
+
+NEW_CONTEXT:
+  accept_downloads: True
+  locale: None
+  user_agent: None
