@@ -47,7 +47,7 @@ class SetDotEnv:
                 variables = dict(os.environ)
 
             if variables:
-                log_allure(F'ENVIRONMENTS VARIABLES: {dict(os.environ)}')
+                log_allure(F'ENVIRONMENTS VARIABLES SET WITH SUCCESS')
                 return variables
             else:
                 raise ValueError(f"No environment variables found.")

@@ -26,6 +26,9 @@ Logging Configuration:
 import logging
 import allure
 
+
+logging.getLogger("asyncio").setLevel(logging.WARNING)
+
 # Configure logging
 if not logging.getLogger().hasHandlers():
     logging.basicConfig(
