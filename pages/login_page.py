@@ -1,19 +1,18 @@
 import allure
-from playwright.sync_api import Page
 from .base_page import BasePage
-from utils.url_helper import get_base_url
+from playwright.sync_api import Page
 
-class HomePage(BasePage):
+class LoginPage(BasePage):
     def __init__(self, page: Page):
         super().__init__(page)
         self.page = page
-        self.url = get_base_url()
+        self.url = "https://demoqa.com/login"
         self.page_title = "DEMOQA"
 
-    @allure.step("Open Home Page")
+    @allure.step("Open Login Page")
     def navigate(self):
         self.navigate_to(self.url)
     
-    @allure.step("Validate Home Page Title")
+    @allure.step("Validate Login Page Title")
     def has_title(self):
         self.check_if_page_has_title(self.page_title)

@@ -7,6 +7,7 @@ from utils.ReadFile import ReadFile
 from utils.logger import log_allure
 from utils.SetDotEnv import SetDotEnv
 from pages.home_page import HomePage
+from pages.login_page import LoginPage
 
 CONFIG_YAML_PATH = './config.yaml'
 
@@ -48,27 +49,6 @@ def set_environment_variables(request, env):
     else:
         dot_env.set_project_environment_variables(pipeline, env)
 
-@pytest.fixture(scope="session", autouse=True)
-def base_url(request, set_environment_variables):
-    """
-    Returns the base URL from environment variables with error handling.
-    """
-    try:
-        base_url = request.config.getoption("--base-url")
-        if base_url:
-            return base_url
-
-        if 'URL' not in os.environ:
-            raise KeyError(
-                "URL environment variable is not set. "
-                "Please check if set_environment_variables is working correctly "
-                "or provide --base-url via command line."
-            )
-
-        return os.environ['URL']
-    except Exception as e:
-        pytest.fail(f"Failed to get base URL: {str(e)}")
-
 @pytest.fixture(scope="function")
 def web_page(browser: Browser) -> Generator[Page, None, None]:
     """Creates a new page with web configuration"""
@@ -107,14 +87,15 @@ def create_page_fixture(page_class):
     """Função auxiliar para criar fixtures de pages"""
 
     @pytest.fixture
-    def web_fixture(web_page, base_url):
-        return page_class(web_page, base_url)
+    def web_fixture(web_page):
+        return page_class(web_page)
 
     @pytest.fixture
-    def mobile_fixture(mobile_page, base_url):
-        return page_class(mobile_page, base_url)
+    def mobile_fixture(mobile_page):
+        return page_class(mobile_page)
 
     return web_fixture, mobile_fixture
 
 # Criar fixtures para cada page
 web_home_page, mobile_home_page = create_page_fixture(HomePage)
+web_login_page, mobile_login_page = create_page_fixture(LoginPage)
