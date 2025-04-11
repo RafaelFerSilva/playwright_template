@@ -3,7 +3,23 @@ DEVICE_NAME: "Nexus 5"
 SQL_SCRIPTS_FOLDER: "./resources/sql/"
 I18N_FOLDER_PATH: "./resources/i18n"
 
-NEW_CONTEXT:
-  accept_downloads: True
-  locale: None
-  user_agent: None
+WEB_CONFIG:
+  viewport:
+    width: 1920
+    height: 1080
+  accept_downloads: true
+  locale: "pt-BR"
+  user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+  # Adicione qualquer outra configuração suportada pelo Playwright aqui
+
+MOBILE_CONFIG:
+  devices:
+    - name: "Nexus 5"
+      viewport:
+        width: 360
+        height: 640
+      device_scale_factor: 2
+      is_mobile: true
+      has_touch: true
+      user_agent: "Mozilla/5.0 (Linux; Android 6.0; Nexus 5)"
+      # Adicione qualquer outra configuração suportada pelo Playwright aqui

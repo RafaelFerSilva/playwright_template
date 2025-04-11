@@ -1,24 +1,23 @@
 import pytest
 import allure
 import os
-from playwright.sync_api import Page
+from playwright.sync_api import Page, Browser
 from typing import Generator
 from utils.ReadFile import ReadFile
 from utils.logger import log_allure
 from utils.SetDotEnv import SetDotEnv
+from pages.home_page import HomePage
 
 CONFIG_YAML_PATH = './config.yaml'
+
+def get_config() -> dict:
+    """Retorna as configurações do arquivo config.yaml"""
+    read_file = ReadFile()
+    return read_file.load_yaml_file(CONFIG_YAML_PATH)
 
 def pytest_addoption(parser):
     parser.addoption("--env", action="store", help="Execution environment: rc, uat")
     parser.addoption("--pipeline", action="store", help="Run tests in pipeline: true, false")
-
-@pytest.fixture(scope="function")
-def page(browser) -> Generator[Page, None, None]:
-    page = browser.new_page()
-    page.set_viewport_size({"width": 1920, "height": 1080})
-    yield page
-    page.close()
 
 @pytest.fixture(scope="session", autouse=True)
 def env(request):
@@ -30,7 +29,7 @@ def env(request):
         return env_option
 
     read_file = ReadFile()
-    config = read_file.load_yaml_file(CONFIG_YAML_PATH)
+    config = get_config()
     log_allure(
         f'Select environment by config file -> {CONFIG_YAML_PATH}: ENVIRONMENT {config["ENVIRONMENT"]}')
     return config["ENVIRONMENT"]
@@ -69,3 +68,53 @@ def base_url(request, set_environment_variables):
         return os.environ['URL']
     except Exception as e:
         pytest.fail(f"Failed to get base URL: {str(e)}")
+
+@pytest.fixture(scope="function")
+def web_page(browser: Browser) -> Generator[Page, None, None]:
+    """Creates a new page with web configuration"""
+    config = get_config()
+    web_config = config.get("WEB_CONFIG", {})
+
+    # Cria o contexto com todas as configurações do WEB_CONFIG
+    context = browser.new_context(**web_config)
+    page = context.new_page()
+    yield page
+    context.close()
+
+@pytest.fixture(scope="function")
+def mobile_page(browser: Browser, device_name: str = "Nexus 5") -> Generator[Page, None, None]:
+    """Creates a new page with mobile configuration"""
+    config = get_config()
+    mobile_config = config.get("MOBILE_CONFIG", {})
+
+    # Encontra a configuração específica do device
+    device_config = next(
+        (device for device in mobile_config.get("devices", [])
+         if device["name"] == device_name),
+        {}
+    )
+
+    # Remove o campo 'name' para não causar conflito
+    if "name" in device_config:
+        del device_config["name"]
+
+    context = browser.new_context(**device_config)
+    page = context.new_page()
+    yield page
+    context.close()
+
+def create_page_fixture(page_class):
+    """Função auxiliar para criar fixtures de pages"""
+
+    @pytest.fixture
+    def web_fixture(web_page, base_url):
+        return page_class(web_page, base_url)
+
+    @pytest.fixture
+    def mobile_fixture(mobile_page, base_url):
+        return page_class(mobile_page, base_url)
+
+    return web_fixture, mobile_fixture
+
+# Criar fixtures para cada page
+web_home_page, mobile_home_page = create_page_fixture(HomePage)
