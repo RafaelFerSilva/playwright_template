@@ -1,11 +1,10 @@
 import pytest
-import allure
-import os
 from playwright.sync_api import Page, Browser
 from typing import Generator
 from utils.ReadFile import ReadFile
 from utils.logger import log_allure
 from utils.SetDotEnv import SetDotEnv
+from utils.url_helper import set_pytest_config
 from pages.home_page import HomePage
 from pages.login_page import LoginPage
 
@@ -19,6 +18,10 @@ def get_config() -> dict:
 def pytest_addoption(parser):
     parser.addoption("--env", action="store", help="Execution environment: rc, uat")
     parser.addoption("--pipeline", action="store", help="Run tests in pipeline: true, false")
+
+def pytest_configure(config):
+    """Configure pytest"""
+    set_pytest_config(config)
 
 @pytest.fixture(scope="session", autouse=True)
 def env(request):
