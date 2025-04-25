@@ -1,12 +1,14 @@
-import pytest
-from playwright.sync_api import Page, Browser
 from typing import Generator
-from utils.ReadFile import ReadFile
-from utils.logger import log_allure
-from utils.SetDotEnv import SetDotEnv
-from utils.url_helper import set_pytest_config
+
+import pytest
+from playwright.sync_api import Browser, Page
+
 from pages.home_page import HomePage
 from pages.login_page import LoginPage
+from utils.logger import log_allure
+from utils.ReadFile import ReadFile
+from utils.SetDotEnv import SetDotEnv
+from utils.url_helper import set_pytest_config
 
 CONFIG_YAML_PATH = './config.yaml'
 

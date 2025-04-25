@@ -1,4 +1,5 @@
 from functools import wraps
+
 from .logger import log_error
 from .screenshot import save_screenshot
 

@@ -1,6 +1,7 @@
 import os
 import shutil
 
+
 def remove_cache_dirs(root_dir="."):
     for root, dirs, files in os.walk(root_dir):
         for dir_name in dirs:

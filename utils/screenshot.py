@@ -20,8 +20,10 @@ Behavior:
 """
 
 import os
-import allure
 from datetime import datetime
+
+import allure
+
 from .logger import log_allure
 
 

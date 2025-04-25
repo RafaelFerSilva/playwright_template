@@ -1,7 +1,10 @@
 import os
+
 import allure
 from dotenv import dotenv_values, load_dotenv
+
 from .logger import log_allure
+
 
 class SetDotEnv:
     def __init__(self):

@@ -1,5 +1,7 @@
 import allure
+
 from pages.home_page import HomePage
+
 
 class TestHome:
     @allure.title('Check Page Title - Web')

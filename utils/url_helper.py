@@ -1,7 +1,8 @@
 import os
-import pytest
-import allure
 from typing import Optional
+
+import allure
+import pytest
 from pytest import Config
 
 from utils.logger import log_allure

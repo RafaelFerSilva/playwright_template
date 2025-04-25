@@ -1,7 +1,10 @@
 import allure
 from playwright.sync_api import Page
-from .base_page import BasePage
+
 from utils.url_helper import get_base_url
+
+from .base_page import BasePage
+
 
 class HomePage(BasePage):
     def __init__(self, page: Page):

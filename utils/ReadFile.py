@@ -1,6 +1,8 @@
-import yaml
 import os
+
 import allure
+import yaml
+
 from .logger import log_allure
 
 

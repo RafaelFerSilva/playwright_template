@@ -1,5 +1,7 @@
 import allure
+
 from pages.login_page import LoginPage
+
 
 class TestLogin:
     @allure.title('Check Page Title - Login Web')

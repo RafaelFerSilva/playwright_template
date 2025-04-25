@@ -24,8 +24,8 @@ Logging Configuration:
 """
 
 import logging
-import allure
 
+import allure
 
 logging.getLogger("asyncio").setLevel(logging.WARNING)
 
