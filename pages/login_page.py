@@ -14,7 +14,7 @@ class LoginPage(BasePage):
     @allure.step("Open Login Page")
     def navigate(self):
         self.navigate_to(self.url)
-    
+
     @allure.step("Validate Login Page Title")
     def has_title(self):
         self.check_if_page_has_title(self.page_title)

@@ -1,12 +1,11 @@
 from functools import wraps
 
-from .logger import log_error
 from .screenshot import save_screenshot
 
 
 def capture_on_failure(func):
     """
-    A decorator function to capture and log exceptions raised during the execution 
+    A decorator function to capture and log exceptions raised during the execution
     of a wrapped function. Additionally, it saves a screenshot for debugging purposes.
 
     Args:
@@ -27,6 +26,7 @@ def capture_on_failure(func):
         def example_function(self):
             # Function logic here
     """
+
     @wraps(func)
     def wrapper(self, *args, **kwargs):
         try:
@@ -35,4 +35,5 @@ def capture_on_failure(func):
             func_name = func.__name__
             save_screenshot(self, func_name)
             raise e
+
     return wrapper

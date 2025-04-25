@@ -1,7 +1,7 @@
 import os
 
 import allure
-from dotenv import dotenv_values, load_dotenv
+from dotenv import load_dotenv
 
 from .logger import log_allure
 
@@ -12,9 +12,7 @@ class SetDotEnv:
 
     @allure.step("Set Project Environment Variables")
     def set_project_environment_variables(
-        self,
-        pipeline: bool = False, 
-        environment: str = 'rc'
+        self, pipeline: bool = False, environment: str = "rc"
     ) -> dict:
         """
         Set Environment Project Variables
@@ -39,21 +37,21 @@ class SetDotEnv:
         try:
             if pipeline:
                 variables = dict(os.environ)
-                log_allure(f'Run tests on Pipeline: {pipeline}')
+                log_allure(f"Run tests on Pipeline: {pipeline}")
             else:
                 env_file = f"{environment.lower()}.env"
                 if not os.path.exists(env_file):
                     raise FileNotFoundError(f"Environment file '{env_file}' not found.")
-                
+
                 load_dotenv(env_file, override=True)
-                log_allure(f'Loaded Environment file: {env_file}')
+                log_allure(f"Loaded Environment file: {env_file}")
                 variables = dict(os.environ)
 
             if variables:
-                log_allure(F'ENVIRONMENTS VARIABLES SET WITH SUCCESS')
+                log_allure("ENVIRONMENTS VARIABLES SET WITH SUCCESS")
                 return variables
             else:
-                raise ValueError(f"No environment variables found.")
+                raise ValueError("No environment variables found.")
 
         except Exception as e:
             raise Exception(f"Error loading environment variables: {e}")

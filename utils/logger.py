@@ -33,12 +33,13 @@ logging.getLogger("asyncio").setLevel(logging.WARNING)
 if not logging.getLogger().hasHandlers():
     logging.basicConfig(
         level=logging.INFO,
-        format='[%(levelname)s] %(message)s',
-        datefmt='%d-%m-%Y %H:%M:%S',
+        format="[%(levelname)s] %(message)s",
+        datefmt="%d-%m-%Y %H:%M:%S",
     )
 
+
 @allure.step("Log - Allure")
-def log_allure(message, name='Log info', type='TEXT'):
+def log_allure(message, name="Log info", type="TEXT"):
     """
     Logs a message to Allure as an attachment.
 
@@ -47,11 +48,8 @@ def log_allure(message, name='Log info', type='TEXT'):
         name (str): The name of the attachment in the Allure report. Default is 'Log info'.
         type (str): The type of attachment (e.g., 'TEXT', 'HTML', etc.). Default is 'TEXT'.
     """
-    allure.attach(
-        message,
-        name,
-        attachment_type=allure.attachment_type[type]
-    )
+    allure.attach(message, name, attachment_type=allure.attachment_type[type])
+
 
 def log_error(message):
     """
@@ -61,7 +59,8 @@ def log_error(message):
         message (str): The error message to log.
     """
     logging.error(message)
-    log_allure(message, 'Error Log')
+    log_allure(message, "Error Log")
+
 
 def log_info(message):
     """

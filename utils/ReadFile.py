@@ -6,7 +6,7 @@ import yaml
 from .logger import log_allure
 
 
-class ReadFile():
+class ReadFile:
     def __init__(self):
         pass
 
@@ -21,16 +21,16 @@ class ReadFile():
         """
         if not os.path.exists(config_file):
             raise FileNotFoundError(f"Config file not found: {config_file}")
-        
+
         try:
-            with open(config_file, 'r') as file:
+            with open(config_file, "r") as file:
                 config = yaml.safe_load(file)
         except yaml.YAMLError as e:
             raise ValueError(f"Error reading YAML file: {e}")
-        
+
         if override:
             config.update(override)
 
-        log_allure(f'File content: {config}')
+        log_allure(f"File content: {config}")
 
         return config

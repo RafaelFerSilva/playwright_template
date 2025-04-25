@@ -10,35 +10,41 @@ from utils.ReadFile import ReadFile
 from utils.SetDotEnv import SetDotEnv
 from utils.url_helper import set_pytest_config
 
-CONFIG_YAML_PATH = './config.yaml'
+CONFIG_YAML_PATH = "./config.yaml"
+
 
 def get_config() -> dict:
     """Retorna as configurações do arquivo config.yaml"""
     read_file = ReadFile()
     return read_file.load_yaml_file(CONFIG_YAML_PATH)
 
+
 def pytest_addoption(parser):
     parser.addoption("--env", action="store", help="Execution environment: rc, uat")
-    parser.addoption("--pipeline", action="store", help="Run tests in pipeline: true, false")
+    parser.addoption(
+        "--pipeline", action="store", help="Run tests in pipeline: true, false"
+    )
+
 
 def pytest_configure(config):
     """Configure pytest"""
     set_pytest_config(config)
+
 
 @pytest.fixture(scope="session", autouse=True)
 def env(request):
 
     env_option = request.config.getoption("--env", default=None)
     if env_option:
-        log_allure(
-            f'Select environment by terminal: ENVIRONMENT {env_option.upper()}')
+        log_allure(f"Select environment by terminal: ENVIRONMENT {env_option.upper()}")
         return env_option
 
-    read_file = ReadFile()
     config = get_config()
     log_allure(
-        f'Select environment by config file -> {CONFIG_YAML_PATH}: ENVIRONMENT {config["ENVIRONMENT"]}')
+        f'Select environment by config file -> {CONFIG_YAML_PATH}: ENVIRONMENT {config["ENVIRONMENT"]}'
+    )
     return config["ENVIRONMENT"]
+
 
 @pytest.fixture(scope="session", autouse=True)
 def set_environment_variables(request, env):
@@ -54,6 +60,7 @@ def set_environment_variables(request, env):
     else:
         dot_env.set_project_environment_variables(pipeline, env)
 
+
 @pytest.fixture(scope="function")
 def web_page(browser: Browser) -> Generator[Page, None, None]:
     """Creates a new page with web configuration"""
@@ -66,17 +73,23 @@ def web_page(browser: Browser) -> Generator[Page, None, None]:
     yield page
     context.close()
 
+
 @pytest.fixture(scope="function")
-def mobile_page(browser: Browser, device_name: str = "Nexus 5") -> Generator[Page, None, None]:
+def mobile_page(
+    browser: Browser, device_name: str = "Nexus 5"
+) -> Generator[Page, None, None]:
     """Creates a new page with mobile configuration"""
     config = get_config()
     mobile_config = config.get("MOBILE_CONFIG", {})
 
     # Encontra a configuração específica do device
     device_config = next(
-        (device for device in mobile_config.get("devices", [])
-         if device["name"] == device_name),
-        {}
+        (
+            device
+            for device in mobile_config.get("devices", [])
+            if device["name"] == device_name
+        ),
+        {},
     )
 
     # Remove o campo 'name' para não causar conflito
@@ -87,6 +100,7 @@ def mobile_page(browser: Browser, device_name: str = "Nexus 5") -> Generator[Pag
     page = context.new_page()
     yield page
     context.close()
+
 
 def create_page_fixture(page_class):
     """Função auxiliar para criar fixtures de pages"""
@@ -100,6 +114,7 @@ def create_page_fixture(page_class):
         return page_class(mobile_page)
 
     return web_fixture, mobile_fixture
+
 
 # Criar fixtures para cada page
 web_home_page, mobile_home_page = create_page_fixture(HomePage)

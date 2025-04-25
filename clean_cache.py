@@ -10,6 +10,7 @@ def remove_cache_dirs(root_dir="."):
                 shutil.rmtree(cache_path)
                 print(f"Removed: {cache_path}")
 
+
 def remove_pytest_cache_dirs(root_dir="."):
     for root, dirs, files in os.walk(root_dir):
         for dir_name in dirs:
@@ -17,6 +18,7 @@ def remove_pytest_cache_dirs(root_dir="."):
                 cache_path = os.path.join(root, dir_name)
                 shutil.rmtree(cache_path)
                 print(f"Removed: {cache_path}")
+
 
 if __name__ == "__main__":
     remove_cache_dirs()
