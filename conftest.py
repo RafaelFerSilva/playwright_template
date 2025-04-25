@@ -5,7 +5,7 @@ from playwright.sync_api import Browser, Page
 
 from pages.home_page import HomePage
 from pages.login_page import LoginPage
-from utils.logger import log_allure
+from utils.logger import log_error
 from utils.ReadFile import ReadFile
 from utils.SetDotEnv import SetDotEnv
 from utils.url_helper import set_pytest_config
@@ -36,11 +36,11 @@ def env(request):
 
     env_option = request.config.getoption("--env", default=None)
     if env_option:
-        log_allure(f"Select environment by terminal: ENVIRONMENT {env_option.upper()}")
+        log_error(f"Select environment by terminal: ENVIRONMENT {env_option.upper()}")
         return env_option
 
     config = get_config()
-    log_allure(
+    log_error(
         f'Select environment by config file -> {CONFIG_YAML_PATH}: ENVIRONMENT {config["ENVIRONMENT"]}'
     )
     return config["ENVIRONMENT"]

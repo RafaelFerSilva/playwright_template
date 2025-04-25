@@ -3,7 +3,7 @@ import os
 import allure
 import yaml
 
-from .logger import log_allure
+from .logger import log_error
 
 
 class ReadFile:
@@ -31,6 +31,6 @@ class ReadFile:
         if override:
             config.update(override)
 
-        log_allure(f"File content: {config}")
+        log_error(f"File content: {config}")
 
         return config

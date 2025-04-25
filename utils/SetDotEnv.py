@@ -3,7 +3,7 @@ import os
 import allure
 from dotenv import load_dotenv
 
-from .logger import log_allure
+from .logger import log_error
 
 
 class SetDotEnv:
@@ -37,18 +37,18 @@ class SetDotEnv:
         try:
             if pipeline:
                 variables = dict(os.environ)
-                log_allure(f"Run tests on Pipeline: {pipeline}")
+                log_error(f"Run tests on Pipeline: {pipeline}")
             else:
                 env_file = f"{environment.lower()}.env"
                 if not os.path.exists(env_file):
                     raise FileNotFoundError(f"Environment file '{env_file}' not found.")
 
                 load_dotenv(env_file, override=True)
-                log_allure(f"Loaded Environment file: {env_file}")
+                log_error(f"Loaded Environment file: {env_file}")
                 variables = dict(os.environ)
 
             if variables:
-                log_allure("ENVIRONMENTS VARIABLES SET WITH SUCCESS")
+                log_error("ENVIRONMENTS VARIABLES SET WITH SUCCESS")
                 return variables
             else:
                 raise ValueError("No environment variables found.")
