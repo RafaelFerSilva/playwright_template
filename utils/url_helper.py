@@ -5,7 +5,7 @@ import allure
 import pytest
 from pytest import Config
 
-from utils.logger import log_error
+from utils.logger import log_allure
 
 _config: Optional[Config] = None
 
@@ -27,12 +27,12 @@ def get_base_url() -> str:
     try:
         # 1. Tenta obter do ambiente
         if "URL" in os.environ:
-            log_error(f"Set base_url by environment: {os.environ['URL']}")
+            log_allure(f"Set base_url by environment: {os.environ['URL']}")
             return os.environ["URL"]
 
         # 2. Tenta obter do pytest.ini
         if _config and _config.inicfg.get("base_url"):
-            log_error(f"Set base_url by pytestini: {_config.inicfg['base_url']}")
+            log_allure(f"Set base_url by pytestini: {_config.inicfg['base_url']}")
             return _config.inicfg["base_url"]
 
         # 3. Se não encontrar em nenhum lugar, lança exceção

@@ -1,11 +1,13 @@
-from typing import Generator
+from typing import Dict, Generator
 
 import pytest
 from playwright.sync_api import Browser, Page
 
 from pages.home_page import HomePage
 from pages.login_page import LoginPage
-from utils.logger import log_error
+from utils.Common import Common
+from utils.DatabaseManager import DatabaseManager
+from utils.logger import log_allure
 from utils.ReadFile import ReadFile
 from utils.SetDotEnv import SetDotEnv
 from utils.url_helper import set_pytest_config
@@ -13,7 +15,8 @@ from utils.url_helper import set_pytest_config
 CONFIG_YAML_PATH = "./config.yaml"
 
 
-def get_config() -> dict:
+@pytest.fixture(scope="session", autouse=True)
+def get_config() -> Dict:
     """Retorna as configurações do arquivo config.yaml"""
     read_file = ReadFile()
     return read_file.load_yaml_file(CONFIG_YAML_PATH)
@@ -32,18 +35,17 @@ def pytest_configure(config):
 
 
 @pytest.fixture(scope="session", autouse=True)
-def env(request):
+def env(request, get_config):
 
     env_option = request.config.getoption("--env", default=None)
     if env_option:
-        log_error(f"Select environment by terminal: ENVIRONMENT {env_option.upper()}")
+        log_allure(f"Select environment by terminal: ENVIRONMENT {env_option.upper()}")
         return env_option
 
-    config = get_config()
-    log_error(
-        f'Select environment by config file -> {CONFIG_YAML_PATH}: ENVIRONMENT {config["ENVIRONMENT"]}'
+    log_allure(
+        f'Select environment by config file -> {CONFIG_YAML_PATH}: ENVIRONMENT {get_config["ENVIRONMENT"]}'
     )
-    return config["ENVIRONMENT"]
+    return get_config["ENVIRONMENT"]
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -62,10 +64,9 @@ def set_environment_variables(request, env):
 
 
 @pytest.fixture(scope="function")
-def web_page(browser: Browser) -> Generator[Page, None, None]:
+def web_page(browser: Browser, get_config) -> Generator[Page, None, None]:
     """Creates a new page with web configuration"""
-    config = get_config()
-    web_config = config.get("WEB_CONFIG", {})
+    web_config = get_config["WEB_CONFIG"]
 
     # Cria o contexto com todas as configurações do WEB_CONFIG
     context = browser.new_context(**web_config)
@@ -76,30 +77,40 @@ def web_page(browser: Browser) -> Generator[Page, None, None]:
 
 @pytest.fixture(scope="function")
 def mobile_page(
-    browser: Browser, device_name: str = "Nexus 5"
+    browser: Browser, get_config, device_name: str = "Nexus 5"
 ) -> Generator[Page, None, None]:
     """Creates a new page with mobile configuration"""
-    config = get_config()
-    mobile_config = config.get("MOBILE_CONFIG", {})
+    mobile_config = get_config["MOBILE_CONFIG"]
+    print(mobile_config)
 
-    # Encontra a configuração específica do device
-    device_config = next(
-        (
-            device
-            for device in mobile_config.get("devices", [])
-            if device["name"] == device_name
-        ),
-        {},
-    )
-
-    # Remove o campo 'name' para não causar conflito
-    if "name" in device_config:
-        del device_config["name"]
-
-    context = browser.new_context(**device_config)
+    context = browser.new_context(**mobile_config)
     page = context.new_page()
     yield page
     context.close()
+
+
+@pytest.fixture(scope="module")
+def db_manager(get_config, env):
+    """Fixture that provides a database connection for tests."""
+    common = Common(env, get_config)
+    db = None
+
+    try:
+        db = common.get_db_manager()
+        if not db or not db.connection.is_connected():
+            pytest.skip("Database connection could not be established")
+
+        yield db
+
+    except Exception as e:
+        pytest.fail(f"Database setup failed: {str(e)}")
+
+    finally:
+        if db and isinstance(db, DatabaseManager):
+            try:
+                db.close_connection()
+            except Exception as e:
+                print(f"Warning: Error closing connection: {e}")
 
 
 def create_page_fixture(page_class):

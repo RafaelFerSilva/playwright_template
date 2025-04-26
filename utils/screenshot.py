@@ -24,7 +24,7 @@ from datetime import datetime
 
 import allure
 
-from .logger import log_error
+from .logger import log_allure
 
 
 @allure.step("Save Screenshot")
@@ -55,6 +55,6 @@ def save_screenshot(self, func_name, type="PNG", folder="screenshots"):
 
     # Attach the screenshot to the Allure report
     with open(screenshot_path, "rb") as f:
-        log_error(
+        log_allure(
             message=f.read(), name=f"{func_name}_screenshot_{timestamp}", type=type
         )

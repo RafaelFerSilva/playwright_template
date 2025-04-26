@@ -1,64 +1,183 @@
 """
 Database Initialization Script
 
-This script initializes a MySQL database by:
-1. Establishing a connection to the MySQL server
-2. Executing SQL commands from an initialization file
-3. Implementing a retry mechanism with timeout
-
-The script will attempt to connect to the database multiple times
-until successful or until the timeout period is reached.
+This enhanced script initializes a MySQL database with:
+- Robust connection handling with retry mechanism
+- Proper transaction management
+- Detailed logging
+- Environment variable support
+- Configurable parameters
+- Type hints and documentation
 """
 
+import os
 import time
+from pathlib import Path
+from typing import Optional
 
 import mysql.connector
+from dotenv import load_dotenv
 
-# Database connection parameters
-DB_HOST = "127.0.0.1"
-DB_USER = "testuser"
-DB_PASSWORD = "testpassword"
-DB_NAME = "testdb"
-INIT_SQL_FILE = "init.sql"  # Path to SQL initialization file
+# Load environment variables from .env file
+load_dotenv()
 
-# Retry mechanism configuration
-TIMEOUT = 60  # Maximum waiting time in seconds
-INTERVAL = 5  # Time between connection attempts in seconds
-elapsed_time = 0  # Tracks total elapsed time
 
-# Attempt to connect to the database with retry logic
-while elapsed_time < TIMEOUT:
-    try:
-        print("Trying to connect to MySQL...")
-        # Establish database connection
-        conn = mysql.connector.connect(
-            host=DB_HOST, user=DB_USER, password=DB_PASSWORD, database=DB_NAME
+class DatabaseInitializer:
+    """
+    A robust database initializer that creates and configures a MySQL database.
+
+    Args:
+        host (str): Database server host. Defaults to '127.0.0.1'
+        user (str): Database username. Defaults to 'testuser'
+        password (str): Database password. Defaults to 'testpassword'
+        database (str): Database name. Defaults to 'testdb'
+        init_file (str): Path to SQL initialization file. Defaults to 'init.sql'
+        timeout (int): Connection timeout in seconds. Defaults to 60
+        interval (int): Retry interval in seconds. Defaults to 5
+    """
+
+    def __init__(
+        self,
+        host: str = "127.0.0.1",
+        user: str = "testuser",
+        password: str = "testpassword",
+        database: str = "testdb",
+        init_file: str = "init.sql",
+        timeout: int = 60,
+        interval: int = 5,
+    ):
+        self.host = os.getenv("DB_HOST", host)
+        self.user = os.getenv("DB_USER", user)
+        self.password = os.getenv("DB_PASSWORD", password)
+        self.database = os.getenv("DB_NAME", database)
+        self.init_file = Path(init_file)
+        self.timeout = timeout
+        self.interval = interval
+        self.connection: Optional[mysql.connector.MySQLConnection] = None
+
+    def initialize(self) -> bool:
+        """
+        Main initialization method that handles the complete process.
+
+        Returns:
+            bool: True if initialization succeeded, False otherwise
+        """
+        try:
+            if not self._connect_with_retry():
+                return False
+
+            if not self._execute_init_script():
+                return False
+
+            return True
+
+        except Exception as e:
+            print(f"⛔ Critical error during initialization: {e}")
+            return False
+        finally:
+            self._close_connection()
+
+    def _connect_with_retry(self) -> bool:
+        """
+        Attempts to connect to the database with retry logic.
+
+        Returns:
+            bool: True if connection succeeded, False if timeout reached
+        """
+        start_time = time.time()
+        attempts = 0
+
+        while (time.time() - start_time) < self.timeout:
+            attempts += 1
+            try:
+                print(f"Attempt #{attempts}: Connecting to MySQL at {self.host}...")
+                self.connection = mysql.connector.connect(
+                    host=self.host,
+                    user=self.user,
+                    password=self.password,
+                    database=self.database,
+                    connect_timeout=5,
+                )
+
+                if self.connection.is_connected():
+                    print(f"✅ Successfully connected to database '{self.database}'")
+                    return True
+
+            except mysql.connector.Error as e:
+                print(f"⚠️ Connection attempt failed: {e}")
+                time.sleep(self.interval)
+                continue
+
+        print(
+            f"⛔ Timeout after {self.timeout} seconds. Could not connect to database."
         )
-        print("✅ Connected to MySQL successfully!")
+        return False
 
-        # Execute the SQL initialization script
-        cursor = conn.cursor()
-        with open(INIT_SQL_FILE, "r") as f:
-            sql_commands = f.read()
-            # Split and execute each SQL command separately
-            for command in sql_commands.split(";"):
-                if command.strip():
-                    cursor.execute(command)
+    def _execute_init_script(self) -> bool:
+        """
+        Executes the SQL initialization script.
 
-        # Commit changes and clean up
-        conn.commit()
-        cursor.close()
-        conn.close()
-        print("✅ Database initialized successfully!")
-        break
+        Returns:
+            bool: True if script executed successfully, False otherwise
+        """
+        if not self.connection or not self.connection.is_connected():
+            print("⛔ No active database connection")
+            return False
 
-    except mysql.connector.Error as e:
-        # Handle connection errors
-        print(f"⚠️ Error connecting to MySQL: {e}")
-        elapsed_time += INTERVAL
-        print(f"Waiting {INTERVAL} seconds before trying again...")
-        time.sleep(INTERVAL)
-else:
-    # Exit if timeout is reached
-    print("⛔ Timeout! MySQL is not available.")
-    exit(1)
+        if not self.init_file.exists():
+            print(f"⛔ Initialization file not found: {self.init_file}")
+            return False
+
+        try:
+            with open(self.init_file, "r") as file:
+                sql_commands = file.read()
+
+            if not sql_commands.strip():
+                print("⚠️ Initialization file is empty")
+                return True  # Considered success with no commands
+
+            with self.connection.cursor() as cursor:
+                # Execute each command separately
+                for command in sql_commands.split(";"):
+                    command = command.strip()
+                    if command:
+                        try:
+                            cursor.execute(command)
+                        except mysql.connector.Error as e:
+                            print(f"⚠️ Error executing command: {command}\nError: {e}")
+                            continue
+
+                self.connection.commit()
+                print("✅ Database initialized successfully")
+                return True
+
+        except Exception as e:
+            print(f"⛔ Error executing initialization script: {e}")
+            self.connection.rollback()
+            return False
+
+    def _close_connection(self) -> None:
+        """Closes the database connection if it exists."""
+        if self.connection and self.connection.is_connected():
+            self.connection.close()
+            print("✅ Database connection closed")
+
+
+if __name__ == "__main__":
+    # Example usage
+    initializer = DatabaseInitializer(
+        host="127.0.0.1",
+        user="testuser",
+        password="testpassword",
+        database="testdb",
+        init_file="init.sql",
+        timeout=60,
+        interval=5,
+    )
+
+    if initializer.initialize():
+        print("🚀 Database initialization completed successfully")
+        exit(0)
+    else:
+        print("❌ Database initialization failed")
+        exit(1)
