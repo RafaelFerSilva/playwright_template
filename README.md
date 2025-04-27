@@ -91,7 +91,7 @@ Execução com makefile
 
 
 # Processo de criação do framework
-Documentamos todo o processo de criação e configuração do framework de testes automatizados utilizando Playwright e pytest.
+Documentamos todo o processo de criação e configuração do projeto com objetivo de facilitar o entendimento do mesmo e o porque de cada implementação.
 
 
 ## Configuração base do pytest
