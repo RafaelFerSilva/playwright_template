@@ -87,12 +87,15 @@ jobs:
           path: ./test-results.xml
           retention-days: 1
 
-      - name: Post Test Results to PR
-        if: always() && github.event_name == 'pull_request'
+      - name: Publish Test Report
+        if: always()
         uses: dorny/test-reporter@v2
         with:
-          name: Pytest Results
+          name: 'Pytest Results'
           path: 'test-results.xml'
-          reporter: java-junit
-          fail-on-error: false
-          token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: 'java-junit'
+          list-suites: 'all'
+          list-tests: 'failed'
+          max-annotations: '50'
+          fail-on-error: 'false'
+          use-actions-summary: 'true'
