@@ -62,7 +62,6 @@ jobs:
 
       - name: Run the tests
         env:
-          # For real testing environments these variables must be secret and not exposed.
           DB_NAME: testdb
           DB_USER: testuser
           DB_PASSWORD: testpassword
@@ -70,13 +69,22 @@ jobs:
           DB_PORT: ${{ job.services.mysql.ports[3306] }}
         run: make pipeline
 
-      - name: Upload Test Results Artifacts
+      - name: Upload Allure Results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: reports
+          name: allure-results
+          path: reports/allure-results
+          retention-days: 3
+
+      - name: Upload Other Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: other-reports
           path: |
-            ./reports
+            ./reports/*.html
+            ./reports/*.json
           retention-days: 3
           if-no-files-found: ignore
 
@@ -103,11 +111,11 @@ jobs:
           path: reports/allure-results
 
       - name: Generate Allure report
-        uses: simple-elf/allure-report-action@master
+        uses: simple-elf/allure-report-action@v2
         with:
           allure_results: reports/allure-results
-          gh_pages: gh-pages
           allure_report: reports/allure-report
+          allure_version: 2.25.0
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
