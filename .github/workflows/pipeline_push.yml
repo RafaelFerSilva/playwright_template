@@ -78,8 +78,8 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: allure-results
-          path: ./reports/allure-report
+          name: reports
+          path: ./reports
           retention-days: 3
 
   deploy:
@@ -102,8 +102,8 @@ jobs:
       - name: Download Allure results
         uses: actions/download-artifact@v4
         with:
-          name: allure-results
-          path: ./allure-results
+          name: reports
+          path: ./reports
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -111,7 +111,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "./reports/allure-report"
+          path: "reports"
 
       - name: Deploy to GitHub Pages
         id: deployment
