@@ -14,3 +14,4 @@ test-results
 logs
 rc.env
 uat.env
+test-results.xml
