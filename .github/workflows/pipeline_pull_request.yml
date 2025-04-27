@@ -87,12 +87,12 @@ jobs:
           path: ./test-results.xml
           retention-days: 1
 
-      - name: Post Test Results
-        if: success() || failure()
+      - name: Post Test Results to PR
+        if: always() && github.event_name == 'pull_request'
         uses: dorny/test-reporter@v2
         with:
-          artifact: pytest-results
-          name: JEST Tests
-          path: './test-results.xml'
-          reporter: jest-junit
+          name: Pytest Results
+          path: 'test-results.xml'
+          reporter: pytest-junit
           fail-on-error: false
+          token: ${{ secrets.GITHUB_TOKEN }}
