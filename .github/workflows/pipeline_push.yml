@@ -100,14 +100,11 @@ jobs:
         name: allure-results
         path: ./allure-results
 
-    - name: Install Allure
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y allure
-
     - name: Generate Allure Report
-      run: |
-        allure generate ./allure-results -o ./allure-report --clean
+      uses: simple-elf/allure-report-action@v1
+      with:
+        allure_results: ./allure-results
+        allure_report: ./allure-report
 
     - name: Setup Pages
       uses: actions/configure-pages@v5
