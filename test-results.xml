@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="5" failures="0" skipped="0" tests="9" time="21.955" timestamp="2025-04-27T13:39:31.882990-03:00" hostname="DESKTOP-QJQSBJ2"><testcase classname="tests.test_database.TestDataBase" name="test_database_query_environment_file" time="0.009"><error message="failed on setup with &quot;Failed: Database setup failed: Missing database configuration: DB_NAME, DB_USER, DB_PASSWORD, DB_HOST&quot;">get_config = {'ENVIRONMENT': 'RC', 'HEADLESS': False, 'MOBILE_CONFIG': {'device_scale_factor': 2, 'has_touch': True, 'is_mobile': T...RA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.7103.48 Mobile Safari/537.36', ...}, 'PIPELINE': False, ...}
+env = 'RC'
+
+    @pytest.fixture(scope="module")
+    def db_manager(get_config, env):
+        """Fixture that provides a database connection for tests."""
+        common = Common(env, get_config)
+        db = None
+
+        try:
+&gt;           db = common.get_db_manager()
+
+conftest.py:188:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;utils.Common.Common object at 0x7f68629b2120&gt;
+
+    @allure.step("Get DB Manager")
+    def get_db_manager(self) -&gt; DatabaseManager:
+        """
+        Returns an instance of the database manager connected using environment variables.
+
+        Returns:
+            DatabaseManager: The connected database manager object.
+
+        Raises:
+            RuntimeError: If there is an error connecting to the database.
+        """
+        db_config = {
+            "DB_NAME": os.getenv("DB_NAME"),
+            "DB_USER": os.getenv("DB_USER"),
+            "DB_PASSWORD": os.getenv("DB_PASSWORD"),
+            "DB_HOST": os.getenv("DB_HOST"),
+            "DB_PORT": int(os.getenv("DB_PORT", "3306")),  # Conversão explícita
+        }
+
+        # Verificação de configuração mínima
+        if not all(db_config.values()):
+            missing = [k for k, v in db_config.items() if not v]
+&gt;           raise RuntimeError(f"Missing database configuration: {', '.join(missing)}")
+E           RuntimeError: Missing database configuration: DB_NAME, DB_USER, DB_PASSWORD, DB_HOST
+
+utils/Common.py:51: RuntimeError
+
+During handling of the above exception, another exception occurred:
+
+get_config = {'ENVIRONMENT': 'RC', 'HEADLESS': False, 'MOBILE_CONFIG': {'device_scale_factor': 2, 'has_touch': True, 'is_mobile': T...RA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.7103.48 Mobile Safari/537.36', ...}, 'PIPELINE': False, ...}
+env = 'RC'
+
+    @pytest.fixture(scope="module")
+    def db_manager(get_config, env):
+        """Fixture that provides a database connection for tests."""
+        common = Common(env, get_config)
+        db = None
+
+        try:
+            db = common.get_db_manager()
+            if not db or not db.connection.is_connected():
+                pytest.skip("Database connection could not be established")
+
+            yield db
+
+        except Exception as e:
+&gt;           pytest.fail(f"Database setup failed: {str(e)}")
+E           Failed: Database setup failed: Missing database configuration: DB_NAME, DB_USER, DB_PASSWORD, DB_HOST
+
+conftest.py:195: Failed</error></testcase><testcase classname="tests.test_database.TestDataBase" name="test_database_query_string" time="0.009"><error message="failed on setup with &quot;Failed: Database setup failed: Missing database configuration: DB_NAME, DB_USER, DB_PASSWORD, DB_HOST&quot;">get_config = {'ENVIRONMENT': 'RC', 'HEADLESS': False, 'MOBILE_CONFIG': {'device_scale_factor': 2, 'has_touch': True, 'is_mobile': T...RA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.7103.48 Mobile Safari/537.36', ...}, 'PIPELINE': False, ...}
+env = 'RC'
+
+    @pytest.fixture(scope="module")
+    def db_manager(get_config, env):
+        """Fixture that provides a database connection for tests."""
+        common = Common(env, get_config)
+        db = None
+
+        try:
+&gt;           db = common.get_db_manager()
+
+conftest.py:188:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;utils.Common.Common object at 0x7f2d8029e120&gt;
+
+    @allure.step("Get DB Manager")
+    def get_db_manager(self) -&gt; DatabaseManager:
+        """
+        Returns an instance of the database manager connected using environment variables.
+
+        Returns:
+            DatabaseManager: The connected database manager object.
+
+        Raises:
+            RuntimeError: If there is an error connecting to the database.
+        """
+        db_config = {
+            "DB_NAME": os.getenv("DB_NAME"),
+            "DB_USER": os.getenv("DB_USER"),
+            "DB_PASSWORD": os.getenv("DB_PASSWORD"),
+            "DB_HOST": os.getenv("DB_HOST"),
+            "DB_PORT": int(os.getenv("DB_PORT", "3306")),  # Conversão explícita
+        }
+
+        # Verificação de configuração mínima
+        if not all(db_config.values()):
+            missing = [k for k, v in db_config.items() if not v]
+&gt;           raise RuntimeError(f"Missing database configuration: {', '.join(missing)}")
+E           RuntimeError: Missing database configuration: DB_NAME, DB_USER, DB_PASSWORD, DB_HOST
+
+utils/Common.py:51: RuntimeError
+
+During handling of the above exception, another exception occurred:
+
+get_config = {'ENVIRONMENT': 'RC', 'HEADLESS': False, 'MOBILE_CONFIG': {'device_scale_factor': 2, 'has_touch': True, 'is_mobile': T...RA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.7103.48 Mobile Safari/537.36', ...}, 'PIPELINE': False, ...}
+env = 'RC'
+
+    @pytest.fixture(scope="module")
+    def db_manager(get_config, env):
+        """Fixture that provides a database connection for tests."""
+        common = Common(env, get_config)
+        db = None
+
+        try:
+            db = common.get_db_manager()
+            if not db or not db.connection.is_connected():
+                pytest.skip("Database connection could not be established")
+
+            yield db
+
+        except Exception as e:
+&gt;           pytest.fail(f"Database setup failed: {str(e)}")
+E           Failed: Database setup failed: Missing database configuration: DB_NAME, DB_USER, DB_PASSWORD, DB_HOST
+
+conftest.py:195: Failed</error></testcase><testcase classname="tests.test_database.TestDataBase" name="test_database_query_replace_file" time="0.001"><error message="failed on setup with &quot;Failed: Database setup failed: Missing database configuration: DB_NAME, DB_USER, DB_PASSWORD, DB_HOST&quot;">get_config = {'ENVIRONMENT': 'RC', 'HEADLESS': False, 'MOBILE_CONFIG': {'device_scale_factor': 2, 'has_touch': True, 'is_mobile': T...RA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.7103.48 Mobile Safari/537.36', ...}, 'PIPELINE': False, ...}
+env = 'RC'
+
+    @pytest.fixture(scope="module")
+    def db_manager(get_config, env):
+        """Fixture that provides a database connection for tests."""
+        common = Common(env, get_config)
+        db = None
+
+        try:
+&gt;           db = common.get_db_manager()
+
+conftest.py:188:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;utils.Common.Common object at 0x7f68629b2120&gt;
+
+    @allure.step("Get DB Manager")
+    def get_db_manager(self) -&gt; DatabaseManager:
+        """
+        Returns an instance of the database manager connected using environment variables.
+
+        Returns:
+            DatabaseManager: The connected database manager object.
+
+        Raises:
+            RuntimeError: If there is an error connecting to the database.
+        """
+        db_config = {
+            "DB_NAME": os.getenv("DB_NAME"),
+            "DB_USER": os.getenv("DB_USER"),
+            "DB_PASSWORD": os.getenv("DB_PASSWORD"),
+            "DB_HOST": os.getenv("DB_HOST"),
+            "DB_PORT": int(os.getenv("DB_PORT", "3306")),  # Conversão explícita
+        }
+
+        # Verificação de configuração mínima
+        if not all(db_config.values()):
+            missing = [k for k, v in db_config.items() if not v]
+&gt;           raise RuntimeError(f"Missing database configuration: {', '.join(missing)}")
+E           RuntimeError: Missing database configuration: DB_NAME, DB_USER, DB_PASSWORD, DB_HOST
+
+utils/Common.py:51: RuntimeError
+
+During handling of the above exception, another exception occurred:
+
+get_config = {'ENVIRONMENT': 'RC', 'HEADLESS': False, 'MOBILE_CONFIG': {'device_scale_factor': 2, 'has_touch': True, 'is_mobile': T...RA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.7103.48 Mobile Safari/537.36', ...}, 'PIPELINE': False, ...}
+env = 'RC'
+
+    @pytest.fixture(scope="module")
+    def db_manager(get_config, env):
+        """Fixture that provides a database connection for tests."""
+        common = Common(env, get_config)
+        db = None
+
+        try:
+            db = common.get_db_manager()
+            if not db or not db.connection.is_connected():
+                pytest.skip("Database connection could not be established")
+
+            yield db
+
+        except Exception as e:
+&gt;           pytest.fail(f"Database setup failed: {str(e)}")
+E           Failed: Database setup failed: Missing database configuration: DB_NAME, DB_USER, DB_PASSWORD, DB_HOST
+
+conftest.py:195: Failed</error></testcase><testcase classname="tests.test_database.TestDataBase" name="test_database_query_file" time="0.001"><error message="failed on setup with &quot;Failed: Database setup failed: Missing database configuration: DB_NAME, DB_USER, DB_PASSWORD, DB_HOST&quot;">get_config = {'ENVIRONMENT': 'RC', 'HEADLESS': False, 'MOBILE_CONFIG': {'device_scale_factor': 2, 'has_touch': True, 'is_mobile': T...RA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.7103.48 Mobile Safari/537.36', ...}, 'PIPELINE': False, ...}
+env = 'RC'
+
+    @pytest.fixture(scope="module")
+    def db_manager(get_config, env):
+        """Fixture that provides a database connection for tests."""
+        common = Common(env, get_config)
+        db = None
+
+        try:
+&gt;           db = common.get_db_manager()
+
+conftest.py:188:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;utils.Common.Common object at 0x7f2d8029e120&gt;
+
+    @allure.step("Get DB Manager")
+    def get_db_manager(self) -&gt; DatabaseManager:
+        """
+        Returns an instance of the database manager connected using environment variables.
+
+        Returns:
+            DatabaseManager: The connected database manager object.
+
+        Raises:
+            RuntimeError: If there is an error connecting to the database.
+        """
+        db_config = {
+            "DB_NAME": os.getenv("DB_NAME"),
+            "DB_USER": os.getenv("DB_USER"),
+            "DB_PASSWORD": os.getenv("DB_PASSWORD"),
+            "DB_HOST": os.getenv("DB_HOST"),
+            "DB_PORT": int(os.getenv("DB_PORT", "3306")),  # Conversão explícita
+        }
+
+        # Verificação de configuração mínima
+        if not all(db_config.values()):
+            missing = [k for k, v in db_config.items() if not v]
+&gt;           raise RuntimeError(f"Missing database configuration: {', '.join(missing)}")
+E           RuntimeError: Missing database configuration: DB_NAME, DB_USER, DB_PASSWORD, DB_HOST
+
+utils/Common.py:51: RuntimeError
+
+During handling of the above exception, another exception occurred:
+
+get_config = {'ENVIRONMENT': 'RC', 'HEADLESS': False, 'MOBILE_CONFIG': {'device_scale_factor': 2, 'has_touch': True, 'is_mobile': T...RA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.7103.48 Mobile Safari/537.36', ...}, 'PIPELINE': False, ...}
+env = 'RC'
+
+    @pytest.fixture(scope="module")
+    def db_manager(get_config, env):
+        """Fixture that provides a database connection for tests."""
+        common = Common(env, get_config)
+        db = None
+
+        try:
+            db = common.get_db_manager()
+            if not db or not db.connection.is_connected():
+                pytest.skip("Database connection could not be established")
+
+            yield db
+
+        except Exception as e:
+&gt;           pytest.fail(f"Database setup failed: {str(e)}")
+E           Failed: Database setup failed: Missing database configuration: DB_NAME, DB_USER, DB_PASSWORD, DB_HOST
+
+conftest.py:195: Failed</error></testcase><testcase classname="tests.test_database.TestDataBase" name="test_get_users" time="0.002"><error message="failed on setup with &quot;Failed: Database setup failed: Missing database configuration: DB_NAME, DB_USER, DB_PASSWORD, DB_HOST&quot;">get_config = {'ENVIRONMENT': 'RC', 'HEADLESS': False, 'MOBILE_CONFIG': {'device_scale_factor': 2, 'has_touch': True, 'is_mobile': T...RA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.7103.48 Mobile Safari/537.36', ...}, 'PIPELINE': False, ...}
+env = 'RC'
+
+    @pytest.fixture(scope="module")
+    def db_manager(get_config, env):
+        """Fixture that provides a database connection for tests."""
+        common = Common(env, get_config)
+        db = None
+
+        try:
+&gt;           db = common.get_db_manager()
+
+conftest.py:188:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;utils.Common.Common object at 0x7f68629b2120&gt;
+
+    @allure.step("Get DB Manager")
+    def get_db_manager(self) -&gt; DatabaseManager:
+        """
+        Returns an instance of the database manager connected using environment variables.
+
+        Returns:
+            DatabaseManager: The connected database manager object.
+
+        Raises:
+            RuntimeError: If there is an error connecting to the database.
+        """
+        db_config = {
+            "DB_NAME": os.getenv("DB_NAME"),
+            "DB_USER": os.getenv("DB_USER"),
+            "DB_PASSWORD": os.getenv("DB_PASSWORD"),
+            "DB_HOST": os.getenv("DB_HOST"),
+            "DB_PORT": int(os.getenv("DB_PORT", "3306")),  # Conversão explícita
+        }
+
+        # Verificação de configuração mínima
+        if not all(db_config.values()):
+            missing = [k for k, v in db_config.items() if not v]
+&gt;           raise RuntimeError(f"Missing database configuration: {', '.join(missing)}")
+E           RuntimeError: Missing database configuration: DB_NAME, DB_USER, DB_PASSWORD, DB_HOST
+
+utils/Common.py:51: RuntimeError
+
+During handling of the above exception, another exception occurred:
+
+get_config = {'ENVIRONMENT': 'RC', 'HEADLESS': False, 'MOBILE_CONFIG': {'device_scale_factor': 2, 'has_touch': True, 'is_mobile': T...RA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.7103.48 Mobile Safari/537.36', ...}, 'PIPELINE': False, ...}
+env = 'RC'
+
+    @pytest.fixture(scope="module")
+    def db_manager(get_config, env):
+        """Fixture that provides a database connection for tests."""
+        common = Common(env, get_config)
+        db = None
+
+        try:
+            db = common.get_db_manager()
+            if not db or not db.connection.is_connected():
+                pytest.skip("Database connection could not be established")
+
+            yield db
+
+        except Exception as e:
+&gt;           pytest.fail(f"Database setup failed: {str(e)}")
+E           Failed: Database setup failed: Missing database configuration: DB_NAME, DB_USER, DB_PASSWORD, DB_HOST
+
+conftest.py:195: Failed</error></testcase><testcase classname="tests.test_login.TestLogin" name="test_check_page_title_login_web" time="16.063" /><testcase classname="tests.test_home.TestHome" name="test_check_page_title_web" time="15.798" /><testcase classname="tests.test_home.TestHome" name="test_check_page_title_mobile" time="5.410" /><testcase classname="tests.test_login.TestLogin" name="test_check_page_title_login_mobile" time="5.065" /></testsuite></testsuites>

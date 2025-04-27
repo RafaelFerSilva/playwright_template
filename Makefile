@@ -8,7 +8,7 @@ headless: clean
 	pytest --headless true
 
 pipeline:
-	pytest --pipeline true --headless true
+	pytest --junit-xml=test-results.xml --pipeline true --headless true
 
 report:
 	allure serve reports/allure-results
