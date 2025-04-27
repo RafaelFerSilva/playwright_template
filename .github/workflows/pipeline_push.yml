@@ -72,17 +72,32 @@ jobs:
           DB_PASSWORD: testpassword
           DB_HOST: 127.0.0.1
           DB_PORT: ${{ job.services.mysql.ports[3306] }}
-        run: make pipeline
+        run: make test
 
-      - name: Generate allure report
-        run: allure generate reports/allure-results --clean --output reports/allure-report
+      - name: Install Allure Commandline
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y allure
+          allure --version
+
+      - name: Generate Allure Report
+        run: |
+          allure generate reports/allure-results --clean -o reports/allure-report
+
+      - name: Upload Allure Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results
+          path: reports/allure-results
+          retention-days: 3
 
       - name: Upload Allure Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: reports
-          path: ./reports
+          name: allure-report
+          path: reports/allure-report
           retention-days: 3
 
   deploy:
@@ -102,11 +117,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Download Allure report
+      - name: Download Allure Report
         uses: actions/download-artifact@v4
         with:
-          name: reports
-          path: ./reports
+          name: allure-report
+          path: reports/allure-report
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
