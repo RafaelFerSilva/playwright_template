@@ -36,34 +36,10 @@ jobs:
         with:
           python-version: "3.13"
 
-      - name: Install Node.js 20.11.1
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20.11.1"
-
-      - name: Create reports folder
-        run: |
-          mkdir -p reports/allure-report
-          mkdir -p reports/allure-results
-
       - name: Install Requirements
         run: |
           python -m pip install --upgrade pip
           pip install -U -r requirements.txt
-
-      - name: Install Playwright
-        run: |
-          playwright install
-
-      - name: Install MySQL Client & Python Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y mysql-client
-          python -m pip install --upgrade pip
-          pip install mysql-connector-python
-
-      - name: Wait for MySQL and Initialize Database
-        run: python init_db.py
 
       - name: Run the tests
         env:
@@ -74,32 +50,11 @@ jobs:
           DB_PORT: ${{ job.services.mysql.ports[3306] }}
         run: make test
 
-      - name: Install Allure Commandline
-        if: always()
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y allure
-          allure --version
-
-      - name: Generate Allure Report
-        if: always()
-        run: |
-          allure generate reports/allure-results --clean -o reports/allure-report
-
       - name: Upload Allure Results
-        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: allure-results
-          path: reports/allure-results
-          retention-days: 3
-
-      - name: Upload Allure Report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: allure-report
-          path: reports/allure-report
+          path: allure-results
           retention-days: 3
 
   deploy:
@@ -119,20 +74,32 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Download Allure Report
+      - name: Download Allure results
         uses: actions/download-artifact@v4
         with:
-          name: allure-report
-          path: reports/allure-report
+          name: allure-results
+          path: allure-results
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Load test report history
+        uses: actions/checkout@v4
+        if: always()
+        continue-on-error: true
         with:
-          path: "reports/allure-report"
+          ref: gh-pages
+          path: gh-pages
 
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Build test report
+        uses: simple-elf/allure-report-action@v1.7
+        if: always()
+        with:
+          gh_pages: gh-pages
+          allure_history: allure-history
+          allure_results: allure-results
+
+      - name: Publish test report
+        uses: peaceiris/actions-gh-pages@v3
+        if: always()
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: allure-history
