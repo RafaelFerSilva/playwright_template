@@ -83,22 +83,29 @@ jobs:
           path: reports/allure-results
           retention-days: 1
 
-      - name: Post combined results
+      - name: Post test summary to PR
         if: always() && github.event_name == 'pull_request'
         uses: actions/github-script@v7
-        env:
-          REPORT_HTML: ${{ toJson(github.job) }}_${{ github.run_id }}.html
         with:
           script: |
-            const { STATUS } = require('./reports/report.html'); // Adapte conforme seu relatório
-            const summary = `## Test Results
-            - Status: ${STATUS}
-            - [Allure Report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
-            - [HTML Report](https://github.com/${{ github.repository }}/suites/${{ github.run_id }}/artifacts/${{ env.REPORT_HTML }})`;
+            const fs = require('fs');
+            try {
+              // Ler apenas o resumo do relatório (não o HTML completo)
+              const testOutput = fs.existsSync('reports/report.html')
+                ? fs.readFileSync('reports/report.html', 'utf8').match(/<div class="summary">([\s\S]*?)<\/div>/i)?.[1]
+                : 'No test report generated';
 
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: summary
-            });
+              const commentBody = `### 🧪 Test Results Summary
+              ${testOutput || 'Could not extract test summary'}
+
+              📊 [Download Full HTML Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts)`;
+
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: commentBody
+              });
+            } catch (error) {
+              core.warning(`Failed to create comment: ${error}`);
+            }
