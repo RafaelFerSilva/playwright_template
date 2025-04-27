@@ -79,33 +79,25 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: allure-results
-          path: reports/allure-results
+          name: pytest-results
+          path: ./test-results.xml
           retention-days: 1
 
-      - name: Post test summary to PR
-        if: always() && github.event_name == 'pull_request'
-        uses: actions/github-script@v7
+      - name: Surface failing tests
+        if: always()
+        uses: pmeier/pytest-results-action@main
         with:
-          script: |
-            const fs = require('fs');
-            try {
-              // Ler apenas o resumo do relatório (não o HTML completo)
-              const testOutput = fs.existsSync('reports/report.html')
-                ? fs.readFileSync('reports/report.html', 'utf8').match(/<div class="summary">([\s\S]*?)<\/div>/i)?.[1]
-                : 'No test report generated';
+          path: test-results.xml
+          summary: true
+          display-options: fEX
+          fail-on-empty: true
+          title: Test results
 
-              const commentBody = `### 🧪 Test Results Summary
-              ${testOutput || 'Could not extract test summary'}
-
-              📊 [Download Full HTML Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts)`;
-
-              await github.rest.issues.createComment({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body: commentBody
-              });
-            } catch (error) {
-              core.warning(`Failed to create comment: ${error}`);
-            }
+      - name: Post Test Results
+        if: success() || failure()
+        uses: dorny/test-reporter@v2
+        with:
+          artifact: pytest-results
+          name: JEST Tests
+          path: './test-results.xml'
+          reporter: jest-junit
