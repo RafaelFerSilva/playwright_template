@@ -2,9 +2,10 @@
 
 ## Descrição
 
-Este é um projeto tem como objetivo a criação de um template para projetos de automação com playwright.
+Este é um projeto que tem como objetivo a criação de um template para projetos de automação de testes com playwright.
 
-Aqui estão os principais temas abordados:
+
+## Principais temas abordados:
 
 - Configuração e Instalação do Projeto
    - Configuração do ambiente com arquivos .env
