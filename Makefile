@@ -12,6 +12,3 @@ pipeline:
 
 report:
 	allure serve reports/allure-results
-
-generate-allure:
-    allure generate reports/allure-results -o reports/allure-report --clean
