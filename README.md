@@ -189,7 +189,7 @@ test: clean
 
 ## page_objects/base_page.py
 
-Iniciaremos cliando uma classe BasePage que servira como ponto de partira para extensão de outras classes, nela adicionamos métodos para ações genéricas nas paginas.
+Iniciaremos cliando uma classe BasePage que servirá como ponto de partida para extensão de outras classes, nela adicionamos métodos para ações genéricas nas paginas.
 
 ```python
 from playwright.sync_api import Page
@@ -447,7 +447,7 @@ class TestHome:
 
 ```
 
-Podemos ver que agora o report começou a ficar com mais informações. E um processo um tanto trabalhoso de ter que criar o próprio report, em outras ferramentas como o Robot Framework temos uma certa facilidade ao ter um report nativo.
+Podemos ver que agora o report começou a ficar com mais informações. É um processo um tanto trabalhoso de ter que criar o próprio report, em outras ferramentas como o Robot Framework temos uma certa facilidade ao ter um report nativo.
 
 ![alt text](readme_images/image7.png)
 
@@ -874,7 +874,7 @@ class TestHome:
 
 ![alt text](readme_images/image9.png)
 
-Neste momento temos já temos um template funcional do qual pode ser otimizado conforme as necessidades.
+Neste momento já temos um template funcional do qual pode ser otimizado conforme as necessidades.
 
 - Pages
     - Arquivo com métodos genéricos
@@ -2251,7 +2251,7 @@ class DatabaseManager:
             return cursor.fetchall() if cursor.with_rows else []
 ```
 
-Nesta classe nós criamos métodos básicos para utilização do database. Para utilizar a classe precisamos instanciar a mesma, para isso vamos criar umA outro classe chamada **utils/Common.py,** esta classe vai nos servir para várias coisas ao longo do projeto, neste momento vamos implementar somente um método para retornar o gerenciador do database:
+Nesta classe nós criamos métodos básicos para utilização do database. Para utilizar a classe precisamos instanciar a mesma, para isso vamos criar uma outra classe chamada **utils/Common.py,** esta classe vai nos servir para várias coisas ao longo do projeto, neste momento vamos implementar somente um método para retornar o gerenciador do database:
 
 **utils/Common.py**
 
