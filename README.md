@@ -12,7 +12,7 @@ Este é um projeto que tem como objetivo a criação de um template para projeto
    - Docker Compose para configuração do banco de dados
    - Gerenciamento de configuração através do config.yaml
 - Estrutura do Framework de Testes
-   - Implementação do Modelo de Objetos de Página
+   - Implementação do Modelo de Page Object
    - Ferramentas e utilitários de teste
    - Gerenciamento e testes do banco de dados
 - Qualidade e Padrões do Código
