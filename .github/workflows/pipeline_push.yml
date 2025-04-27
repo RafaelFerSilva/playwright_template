@@ -82,7 +82,6 @@ jobs:
           if-no-files-found: ignore
 
   deploy:
-      needs: push_tests
       runs-on: ubuntu-latest
       permissions:
         pages: write      # to deploy to Pages
