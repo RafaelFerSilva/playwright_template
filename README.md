@@ -69,12 +69,25 @@ Script para limpar cache
 
 Execução dos testes com pytest
 
+    # Executar com Chromium (padrão)
     pytest
+
+    # Executar com Firefox
+    pytest --browser firefox
+
+    # Executar com WebKit
+    pytest --browser webkit
+
+    # Executar em headless mode
+    pytest --headless true
 
 
 Execução com makefile
 
+    # Executar com Chromium (padrão)
     make test
+
+
 
 
 ## Allure Reporting

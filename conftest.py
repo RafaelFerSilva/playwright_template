@@ -1,7 +1,7 @@
 from typing import Dict, Generator
 
 import pytest
-from playwright.sync_api import Browser, Page
+from playwright.sync_api import Browser, BrowserType, Page, sync_playwright
 
 from pages.home_page import HomePage
 from pages.login_page import LoginPage
@@ -15,6 +15,65 @@ from utils.url_helper import set_pytest_config
 CONFIG_YAML_PATH = "./config.yaml"
 
 
+@pytest.fixture(scope="session")
+def playwright_instance():
+    """Fixture para gerenciar a instância do Playwright"""
+    playwright = sync_playwright().start()
+    yield playwright
+    playwright.stop()
+
+
+@pytest.fixture(scope="session")
+def browser_type(request, playwright_instance) -> BrowserType:
+    """Fixture para selecionar o tipo de navegador"""
+    # Obtém a opção --browser, garantindo que seja uma string
+    browser_option = request.config.getoption("--browser")
+
+    # Define o navegador padrão como 'chromium' se não for especificado
+    browser_name = "chromium"
+
+    if browser_option:
+        # Se for uma lista, pega o primeiro elemento
+        if isinstance(browser_option, list):
+            browser_name = browser_option[0].lower()
+        else:
+            browser_name = str(browser_option).lower()
+
+    # Mapeamento dos navegadores suportados
+    browser_map = {
+        "chromium": playwright_instance.chromium,
+        "firefox": playwright_instance.firefox,
+        "webkit": playwright_instance.webkit,
+    }
+
+    # Verifica se o navegador solicitado é suportado
+    if browser_name not in browser_map:
+        raise ValueError(
+            f"Navegador '{browser_name}' não é suportado. "
+            f"Opções válidas: {list(browser_map.keys())}"
+        )
+
+    return browser_map[browser_name]
+
+
+@pytest.fixture(scope="session")
+def browser(browser_type, is_headless) -> Generator[Browser, None, None]:
+    """Fixture principal do Playwright com suporte a headless mode"""
+    headless = (
+        is_headless.lower() == "true"
+        if isinstance(is_headless, str)
+        else bool(is_headless)
+    )
+
+    browser = browser_type.launch(
+        headless=headless,
+        args=["--disable-gpu", "--no-sandbox"],
+        slow_mo=100 if not headless else 0,
+    )
+    yield browser
+    browser.close()
+
+
 @pytest.fixture(scope="session", autouse=True)
 def get_config() -> Dict:
     """Retorna as configurações do arquivo config.yaml"""
@@ -26,6 +85,9 @@ def pytest_addoption(parser):
     parser.addoption("--env", action="store", help="Execution environment: rc, uat")
     parser.addoption(
         "--pipeline", action="store", help="Run tests in pipeline: true, false"
+    )
+    parser.addoption(
+        "--headless", action="store", help="Run tests in headless mode: true, false"
     )
 
 
@@ -65,34 +127,53 @@ def is_pipeline(request, get_config):
 
 
 @pytest.fixture(scope="session", autouse=True)
-def set_environment_variables(env, is_pipeline):
+def is_headless(request, get_config):
+
+    headless_option = request.config.getoption("--headless", default=None)
+    if headless_option:
+        log_allure(
+            f"Select headless execution by terminal: HEADLESS {headless_option.upper()}"
+        )
+        return headless_option
+
+    log_allure(
+        f'Select headless execution by config file -> {CONFIG_YAML_PATH}: HEADLESS {get_config["HEADLESS"]}'
+    )
+    return get_config["HEADLESS"]
+
+
+@pytest.fixture(scope="session", autouse=True)
+def set_environment_variables(env, is_pipeline, is_headless):
     """
     Loads environment variables into the project before running tests.
     """
     dot_env = SetDotEnv()
-    dot_env.set_project_environment_variables(is_pipeline, env)
+    dot_env.set_project_environment_variables(is_pipeline, env, is_headless)
 
 
 @pytest.fixture(scope="function")
 def web_page(browser: Browser, get_config) -> Generator[Page, None, None]:
     """Creates a new page with web configuration"""
     web_config = get_config["WEB_CONFIG"]
+    timeout = web_config.get("TIMEOUT")
 
     # Cria o contexto com todas as configurações do WEB_CONFIG
     context = browser.new_context(**web_config)
     page = context.new_page()
+    page.set_default_timeout(timeout)
     yield page
     context.close()
 
 
 @pytest.fixture(scope="function")
-def mobile_page(
-    browser: Browser, get_config, playwright
-) -> Generator[Page, None, None]:
+def mobile_page(browser: Browser, get_config) -> Generator[Page, None, None]:
     """Creates a new page with mobile configuration"""
     mobile_config = get_config["MOBILE_CONFIG"]
+    timeout = mobile_config.get("TIMEOUT")
+
     context = browser.new_context(**mobile_config)
     page = context.new_page()
+    page.set_default_timeout(timeout)
     yield page
     context.close()
 

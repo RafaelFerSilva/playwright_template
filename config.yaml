@@ -1,6 +1,8 @@
 ENVIRONMENT: "RC"
 SQL_SCRIPTS_FOLDER: "./resources/sql/"
 PIPELINE: false
+HEADLESS: false
+TIMEOUT: 15000
 
 WEB_CONFIG:
   viewport:

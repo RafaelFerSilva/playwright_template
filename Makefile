@@ -4,8 +4,11 @@ clean:
 test: clean
 	pytest
 
+headless: clean
+	pytest --headless true
+
 pipeline:
-	pytest --pipeline true
+	pytest --pipeline true --headless true
 
 report:
 	allure serve reports/allure-results

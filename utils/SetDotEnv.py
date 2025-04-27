@@ -12,7 +12,7 @@ class SetDotEnv:
 
     @allure.step("Set Project Environment Variables")
     def set_project_environment_variables(
-        self, pipeline: bool = False, environment: str = "rc"
+        self, pipeline: bool = False, environment: str = "rc", is_headless: bool = False
     ) -> dict:
         """
         Set Environment Project Variables
@@ -37,6 +37,7 @@ class SetDotEnv:
         try:
             if pipeline:
                 variables = dict(os.environ)
+                variables["HEADLESS"] = is_headless
                 log_allure(f"Run tests on Pipeline: {pipeline}")
             else:
                 env_file = f"{environment.lower()}.env"
@@ -46,6 +47,7 @@ class SetDotEnv:
                 load_dotenv(env_file, override=True)
                 log_allure(f"Loaded Environment file: {env_file}")
                 variables = dict(os.environ)
+                variables["HEADLESS"] = is_headless
 
             if variables:
                 log_allure("ENVIRONMENTS VARIABLES SET WITH SUCCESS")
