@@ -4,5 +4,8 @@ clean:
 test: clean
 	pytest
 
+pipeline:
+	pytest --pipeline true
+
 report:
 	allure serve reports/allure-results

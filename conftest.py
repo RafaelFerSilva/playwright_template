@@ -49,18 +49,28 @@ def env(request, get_config):
 
 
 @pytest.fixture(scope="session", autouse=True)
-def set_environment_variables(request, env):
+def is_pipeline(request, get_config):
+
+    pipeline_option = request.config.getoption("--pipeline", default=None)
+    if pipeline_option:
+        log_allure(
+            f"Select pipeline execution by terminal: PIPELINE {pipeline_option.upper()}"
+        )
+        return pipeline_option
+
+    log_allure(
+        f'Select pipeline execution by config file -> {CONFIG_YAML_PATH}: PIPELINE {get_config["PIPELINE"]}'
+    )
+    return get_config["PIPELINE"]
+
+
+@pytest.fixture(scope="session", autouse=True)
+def set_environment_variables(env, is_pipeline):
     """
     Loads environment variables into the project before running tests.
     """
     dot_env = SetDotEnv()
-    environment = request.config.getoption("--env", default=None)
-    pipeline = request.config.getoption("--pipeline", default=False)
-
-    if environment:
-        dot_env.set_project_environment_variables(pipeline, environment)
-    else:
-        dot_env.set_project_environment_variables(pipeline, env)
+    dot_env.set_project_environment_variables(is_pipeline, env)
 
 
 @pytest.fixture(scope="function")

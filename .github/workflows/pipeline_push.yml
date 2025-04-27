@@ -62,9 +62,9 @@ jobs:
           DB_NAME: testdb
           DB_USER: testuser
           DB_PASSWORD: testpassword
-          DB_HOST: localhost
+          DB_HOST: 127.0.0.1
           DB_PORT: ${{ job.services.mysql.ports[3306] }}
-        run: make test
+        run: make pipeline
 
       - name: Upload Test Results Artifacts
         if: always()
