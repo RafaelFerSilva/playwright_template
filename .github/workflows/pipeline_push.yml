@@ -82,11 +82,36 @@ jobs:
           path: reports/allure-results
           retention-days: 3
 
+      - name: Upload Pytest XML Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-results
+          path: ./test-results.xml
+          retention-days: 1
+
+      - name: Publish Test Report
+        if: always()
+        uses: dorny/test-reporter@v2
+        with:
+          name: 'Pytest Results'
+          path: 'test-results.xml'
+          reporter: 'java-junit'
+          list-suites: 'all'
+          list-tests: 'failed'
+          max-annotations: '50'
+          fail-on-error: 'false'
+          use-actions-summary: 'true'
+
   deploy:
     needs: push_tests
     runs-on: ubuntu-latest
     permissions:
       pages: write
+      actions: read
+      checks: write
+      contents: read
+      pull-requests: write
       id-token: write
     environment:
       name: github-pages
