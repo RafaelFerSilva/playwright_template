@@ -9,7 +9,7 @@ on:
 jobs:
   push_tests:
     permissions: write-all
-    name: Push Tests
+    name: Pull Request Tests
     runs-on: ubuntu-24.04
 
     services:
@@ -81,4 +81,24 @@ jobs:
         with:
           name: allure-results
           path: reports/allure-results
-          retention-days: 3
+          retention-days: 1
+
+      - name: Post combined results
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        env:
+          REPORT_HTML: ${{ toJson(github.job) }}_${{ github.run_id }}.html
+        with:
+          script: |
+            const { STATUS } = require('./reports/report.html'); // Adapte conforme seu relatório
+            const summary = `## Test Results
+            - Status: ${STATUS}
+            - [Allure Report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            - [HTML Report](https://github.com/${{ github.repository }}/suites/${{ github.run_id }}/artifacts/${{ env.REPORT_HTML }})`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: summary
+            });
