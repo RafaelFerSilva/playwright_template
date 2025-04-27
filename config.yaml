@@ -1,6 +1,5 @@
 ENVIRONMENT: "RC"
 SQL_SCRIPTS_FOLDER: "./resources/sql/"
-I18N_FOLDER_PATH: "./resources/i18n"
 
 WEB_CONFIG:
   viewport:
@@ -11,6 +10,7 @@ WEB_CONFIG:
   user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
   # Adicione qualquer outra configuração suportada pelo Playwright aqui
 
+# Devices list: https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/deviceDescriptorsSource.json
 MOBILE_CONFIG:
   viewport:
     width: 360
@@ -18,5 +18,5 @@ MOBILE_CONFIG:
   device_scale_factor: 2
   is_mobile: true
   has_touch: true
-  user_agent: "Mozilla/5.0 (Linux; Android 6.0; Nexus 5)"
+  user_agent: "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.7103.48 Mobile Safari/537.36"
   # Adicione qualquer outra configuração suportada pelo Playwright aqui

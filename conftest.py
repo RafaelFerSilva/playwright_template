@@ -77,12 +77,10 @@ def web_page(browser: Browser, get_config) -> Generator[Page, None, None]:
 
 @pytest.fixture(scope="function")
 def mobile_page(
-    browser: Browser, get_config, device_name: str = "Nexus 5"
+    browser: Browser, get_config, playwright
 ) -> Generator[Page, None, None]:
     """Creates a new page with mobile configuration"""
     mobile_config = get_config["MOBILE_CONFIG"]
-    print(mobile_config)
-
     context = browser.new_context(**mobile_config)
     page = context.new_page()
     yield page
