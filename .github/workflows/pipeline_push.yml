@@ -75,12 +75,14 @@ jobs:
         run: make test
 
       - name: Install Allure Commandline
+        if: always()
         run: |
           sudo apt-get update
           sudo apt-get install -y allure
           allure --version
 
       - name: Generate Allure Report
+        if: always()
         run: |
           allure generate reports/allure-results --clean -o reports/allure-report
 
