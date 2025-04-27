@@ -8,7 +8,11 @@ on:
 
 jobs:
   push_tests:
-    permissions: write-all
+    permissions:
+      actions: read
+      checks: write
+      contents: read
+      pull-requests: write
     name: Pull Request Tests
     runs-on: ubuntu-24.04
 
@@ -82,16 +86,6 @@ jobs:
           name: pytest-results
           path: ./test-results.xml
           retention-days: 1
-
-      - name: Surface failing tests
-        if: always()
-        uses: pmeier/pytest-results-action@main
-        with:
-          path: test-results.xml
-          summary: true
-          display-options: fEX
-          fail-on-empty: true
-          title: Test results
 
       - name: Post Test Results
         if: success() || failure()
