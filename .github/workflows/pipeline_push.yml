@@ -78,20 +78,9 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: allure-results
-          path: reports/allure-results
+          name: reports
+          path: ./reports
           retention-days: 3
-
-      - name: Upload Other Reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: other-reports
-          path: |
-            ./reports/*.html
-            ./reports/*.json
-          retention-days: 3
-          if-no-files-found: ignore
 
   deploy:
     runs-on: ubuntu-latest
@@ -113,8 +102,8 @@ jobs:
       - name: Download Allure results
         uses: actions/download-artifact@v4
         with:
-          name: allure-results
-          path: reports/allure-results
+          name: reports
+          path: ./reports
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
