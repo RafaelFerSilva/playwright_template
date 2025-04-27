@@ -93,6 +93,6 @@ jobs:
         with:
           name: Pytest Results
           path: 'test-results.xml'
-          reporter: pytest-junit
+          reporter: java-junit
           fail-on-error: false
           token: ${{ secrets.GITHUB_TOKEN }}
