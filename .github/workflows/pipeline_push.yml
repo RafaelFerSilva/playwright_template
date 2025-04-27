@@ -111,13 +111,6 @@ jobs:
           name: allure-results
           path: reports/allure-results
 
-      - name: Generate Allure report
-        uses: simple-elf/allure-report-action@v2
-        with:
-          allure_results: reports/allure-results
-          allure_report: reports/allure-report
-          allure_version: 2.25.0
-
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
