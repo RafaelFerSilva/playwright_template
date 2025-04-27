@@ -88,8 +88,8 @@ jobs:
     permissions:
       pages: write
       id-token: write
-      actions: read
-      contents: read
+      actions: write
+      contents: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
